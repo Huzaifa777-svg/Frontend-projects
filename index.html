@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini E-Commerce</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+    }
+    header {
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    .products, .cart {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 20px;
+      justify-content: center;
+    }
+    .product, .cart-item {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      width: 200px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .product button, .cart-item button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cart-total {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mini E-Commerce Store</h1>
+  </header>
+
+  <section class="products" id="product-list">
+    <!-- Products will be injected here -->
+  </section>
+
+  <h2 style="text-align:center">🛒 Cart</h2>
+  <section class="cart" id="cart">
+    <!-- Cart items will appear here -->
+  </section>
+  <div class="cart-total" id="cart-total">Total: Rs. 0</div>
+
+  <script>
+    const products = [
+      { id: 1, name: "Egg Tray (30 eggs)", price: 450 },
+      { id: 2, name: "Desi Eggs (12 eggs)", price: 320 },
+      { id: 3, name: "Omega Eggs Pack", price: 380 },
+      { id: 4, name: "Brown Eggs (Half dozen)", price: 180 },
+    ];
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const productList = document.getElementById("product-list");
+    const cartContainer = document.getElementById("cart");
+    const cartTotal = document.getElementById("cart-total");
+
+    function renderProducts() {
+      products.forEach(product => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <h3>${product.name}</h3>
+          <p>Price: Rs. ${product.price}</p>
+          <button onclick="addToCart(${product.id})">Add to Cart</button>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    function renderCart() {
+      cartContainer.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        const product = products.find(p => p.id === item.id);
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <h4>${product.name}</h4>
+          <p>Qty: ${item.qty}</p>
+          <p>Price: Rs. ${product.price * item.qty}</p>
+          <button onclick="removeFromCart(${item.id})">Remove</button>
+        `;
+        cartContainer.appendChild(div);
+        total += product.price * item.qty;
+      });
+      cartTotal.innerText = `Total: Rs. ${total}`;
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    function addToCart(id) {
+      const item = cart.find(i => i.id === id);
+      if (item) {
+        item.qty++;
+      } else {
+        cart.push({ id, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      const index = cart.findIndex(i => i.id === id);
+      if (index !== -1) {
+        cart.splice(index, 1);
+      }
+      renderCart();
+    }
+
+    // Initialize
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
